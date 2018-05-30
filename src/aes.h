@@ -21,7 +21,7 @@ public:
         AES_OFB_Mode,
     };
 
-    Aes(AESKeyLength keyLength, AESMode mode, const ByteArray& key);
+    Aes(AESKeyLength keyLength, const ByteArray& key, AESMode mode = AES_CBC_Mode);
     virtual ~Aes();
 
     void setInitializationVector(const ByteArray& iv)

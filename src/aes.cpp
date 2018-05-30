@@ -53,7 +53,7 @@ const uint32_t Aes::RCON[10] = {
     0x36000000,
 };
 
-Aes::Aes(AESKeyLength keyLength, AESMode mode, const ByteArray& key)
+Aes::Aes(AESKeyLength keyLength, const ByteArray& key, AESMode mode)
     : m_mode(mode), m_w(nullptr), m_iv(16)
 {
     switch (keyLength)
@@ -88,8 +88,24 @@ ByteArray Aes::encrypt(const ByteArray& text) const
     for (int i = text.length(); i < state.length(); i++)
         state[i] = padding;
 
-    for (int i = 0; i < state.length(); i += m_block_bytes)
-        encryptOneBlock(&state[i]);
+    const uint8_t* last = &m_iv[0];
+    switch (m_mode)
+    {
+    default:
+    case AES_CBC_Mode:
+        for (int i = 0; i < state.length(); i += m_block_bytes)
+        {
+            for (int j = 0; j < m_block_bytes; j++)
+                state[i + j] ^= last[j];
+            encryptOneBlock(&state[i]);
+            last = &state[i];
+        }
+        break;
+    case AES_ECB_Mode:
+        for (int i = 0; i < state.length(); i += m_block_bytes)
+            encryptOneBlock(&state[i]);
+        break;
+    }
 
     return state;
 }
@@ -98,9 +114,25 @@ ByteArray Aes::decrypt(const ByteArray& cipher) const
 {
     assert(cipher.length() % m_block_bytes == 0);
 
+    const uint8_t* last = &m_iv[0];
     ByteArray state(cipher);
-    for (int i = 0; i < cipher.length(); i += m_block_bytes)
-        decryptOneBlock(&state[i]);
+    switch (m_mode)
+    {
+    default:
+    case AES_CBC_Mode:
+        for (int i = 0; i < cipher.length(); i += m_block_bytes)
+        {
+            decryptOneBlock(&state[i]);
+            for (int j = 0; j < m_block_bytes; j++)
+                state[i + j] ^= last[j];
+            last = &cipher[i];
+        }
+        break;
+    case AES_ECB_Mode:
+        for (int i = 0; i < cipher.length(); i += m_block_bytes)
+            decryptOneBlock(&state[i]);
+        break;
+    }
 
     int padding = validatePadding(state);
     if (padding < 0)

@@ -41,6 +41,13 @@ ByteArray::~ByteArray()
         delete[] m_a;
 }
 
+ByteArray& ByteArray::operator=(const ByteArray& array)
+{
+    m_len = array.m_len;
+    memcpy(m_a, array.m_a, m_len * sizeof(uint8_t));
+    return *this;
+}
+
 ByteArray& ByteArray::operator=(ByteArray&& array)
 {
     if (this != &array)
@@ -78,4 +85,9 @@ std::string ByteArray::toHexString() const
     for (int i = 0; i < m_len; i++)
         str += Utils::byte2hex(m_a[i]);
     return str;
+}
+
+void ByteArray::copy(const ByteArray& a, int sa, const ByteArray& b, int sb, int len)
+{
+    memcpy(a.m_a + sa, b.m_a + sb, len * sizeof(uint8_t));
 }

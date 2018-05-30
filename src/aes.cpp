@@ -54,7 +54,7 @@ const uint32_t Aes::RCON[10] = {
 };
 
 Aes::Aes(AESKeyLength keyLength, AESMode mode, const ByteArray& key)
-    : m_mode(mode), m_w(nullptr)
+    : m_mode(mode), m_w(nullptr), m_iv(16)
 {
     switch (keyLength)
     {
@@ -70,6 +70,7 @@ Aes::Aes(AESKeyLength keyLength, AESMode mode, const ByteArray& key)
         break;
         break;
     }
+    m_block_bytes = Nb * 4;
     keyExpansion(key.length() >= Nk * 4 ? key : key.padding(Nk * 4));
 }
 
@@ -79,11 +80,48 @@ Aes::~Aes()
         delete[] m_w;
 }
 
-ByteArray Aes::encrypt(const ByteArray& text)
+ByteArray Aes::encrypt(const ByteArray& text) const
 {
-    assert(text.length() == Nb * 4);
+    int padding = m_block_bytes - text.length() % m_block_bytes;
+    ByteArray state(text.length() + padding);
+    ByteArray::copy(state, 0, text, 0, text.length());
+    for (int i = text.length(); i < state.length(); i++)
+        state[i] = padding;
 
-    ByteArray state = text;
+    for (int i = 0; i < state.length(); i += m_block_bytes)
+        encryptOneBlock(&state[i]);
+
+    return state;
+}
+
+ByteArray Aes::decrypt(const ByteArray& cipher) const
+{
+    assert(cipher.length() % m_block_bytes == 0);
+
+    ByteArray state(cipher);
+    for (int i = 0; i < cipher.length(); i += m_block_bytes)
+        decryptOneBlock(&state[i]);
+
+    int padding = validatePadding(state);
+    if (padding < 0)
+        return ByteArray("ERROR");
+    else
+        state.clip(state.length() - padding);
+
+    return state;
+}
+
+int Aes::validatePadding(const ByteArray& text) const
+{
+    int padding = text[text.length() - 1];
+    if (padding == 0 || padding > 16 || padding > text.length()) return -1;
+    for (int i = 1; i <= padding; i++)
+        if (text[text.length() - i] != padding) return -1;
+    return padding;
+}
+
+void Aes::encryptOneBlock(uint8_t* state) const
+{
     addRoundKey(state, &m_w[0]);
     for (int i = 1; i <= Nr; i++)
     {
@@ -92,14 +130,10 @@ ByteArray Aes::encrypt(const ByteArray& text)
         if (i < Nr) mixColumns(state);
         addRoundKey(state, &m_w[i * 4]);
     }
-    return state;
 }
 
-ByteArray Aes::decrypt(const ByteArray& cipher)
+void Aes::decryptOneBlock(uint8_t* state) const
 {
-    assert(cipher.length() == Nb * 4);
-
-    ByteArray state = cipher;
     addRoundKey(state, &m_w[Nr * 4]);
     for (int i = Nr - 1; i >= 0; i--)
     {
@@ -108,10 +142,9 @@ ByteArray Aes::decrypt(const ByteArray& cipher)
         addRoundKey(state, &m_w[i * 4]);
         if (i > 0) invMixColumns(state);
     }
-    return state;
 }
 
-void Aes::addRoundKey(ByteArray& state, const uint32_t* roundKey) const
+void Aes::addRoundKey(uint8_t* state, const uint32_t* roundKey) const
 {
     for (int i = 0; i < Nb; i++)
     {
@@ -120,21 +153,21 @@ void Aes::addRoundKey(ByteArray& state, const uint32_t* roundKey) const
     }
 }
 
-void Aes::subBytes(ByteArray& state) const
+void Aes::subBytes(uint8_t* state) const
 {
-    for (int i = 0; i < Nb * 4; i++)
+    for (int i = 0; i < m_block_bytes; i++)
         state[i] = Utils::sub_byte(state[i], SBOX);
 }
 
-void Aes::invSubBytes(ByteArray& state) const
+void Aes::invSubBytes(uint8_t* state) const
 {
-    for (int i = 0; i < Nb * 4; i++)
+    for (int i = 0; i < m_block_bytes; i++)
         state[i] = Utils::sub_byte(state[i], ISBOX);
 }
 
-void Aes::shiftRows(ByteArray& state) const
+void Aes::shiftRows(uint8_t* state) const
 {
-    assert(Nb == 4);
+    assert(m_block_bytes == 16);
     uint8_t tmp = state[1];
     state[1] = state[5], state[5] = state[9], state[9] = state[13], state[13] = tmp;
     tmp = state[3];
@@ -143,9 +176,9 @@ void Aes::shiftRows(ByteArray& state) const
     tmp = state[6], state[6] = state[14], state[14] = tmp;
 }
 
-void Aes::invShiftRows(ByteArray& state) const
+void Aes::invShiftRows(uint8_t* state) const
 {
-    assert(Nb == 4);
+    assert(m_block_bytes == 16);
     uint8_t tmp = state[1];
     state[1] = state[13], state[13] = state[9], state[9] = state[5], state[5] = tmp;
     tmp = state[3];
@@ -154,10 +187,10 @@ void Aes::invShiftRows(ByteArray& state) const
     tmp = state[6], state[6] = state[14], state[14] = tmp;
 }
 
-void Aes::mixColumns(ByteArray& state) const
+void Aes::mixColumns(uint8_t* state) const
 {
     assert(Nb == 4);
-    for (int i = 0; i < Nb * 4; i += 4)
+    for (int i = 0; i < m_block_bytes; i += 4)
     {
         uint8_t a = state[i];
         uint8_t b = state[i + 1];
@@ -172,10 +205,10 @@ void Aes::mixColumns(ByteArray& state) const
     }
 }
 
-void Aes::invMixColumns(ByteArray& state) const
+void Aes::invMixColumns(uint8_t* state) const
 {
     assert(Nb == 4);
-    for (int i = 0; i < Nb * 4; i += 4)
+    for (int i = 0; i < m_block_bytes; i += 4)
     {
         uint8_t a = state[i];
         uint8_t b = state[i + 1];
@@ -211,7 +244,7 @@ void Aes::keyExpansion(const ByteArray& key)
     }
 }
 
-void Aes::printState(const ByteArray& state) const
+void Aes::printState(const uint8_t* state) const
 {
     for (int i = 0; i < 4; i++)
     {

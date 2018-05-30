@@ -15,7 +15,13 @@ public:
     ByteArray(ByteArray&& array);
     virtual ~ByteArray();
 
+    ByteArray& operator=(const ByteArray& array);
     ByteArray& operator=(ByteArray&& array);
+
+    void clip(int size)
+    {
+        if (size < m_len) m_len = size;
+    }
 
     int length() const { return m_len; }
 
@@ -27,6 +33,8 @@ public:
 
     uint8_t& operator[](int i) { return m_a[i]; }
     const uint8_t& operator[](int i) const { return m_a[i]; }
+
+    static void copy(const ByteArray& a, int sa, const ByteArray& b, int sb, int len);
 
 private:
     int m_len;

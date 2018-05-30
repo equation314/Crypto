@@ -22,11 +22,11 @@ int main()
     printf("input: %s\n", ByteArray(input).toPlainText().c_str());
 
     printf("cipher(128): %s\n", cipher128.toHexString().c_str());
-    // a91329af99a78d02aec17c507757aaef
+    // a91329af99a78d02aec17c507757aaef8e64ce873f174dbb2423fcd814580e15
     printf("cipher(192): %s\n", cipher192.toHexString().c_str());
-    // 3126ffb3ec87aab9e46b846d20b3c475
+    // 3126ffb3ec87aab9e46b846d20b3c475a89fb830a4595e587dc63a367a41bfa9
     printf("cipher(256): %s\n", cipher256.toHexString().c_str());
-    // 69937a27dc9d720a960a661524c803a2
+    // 69937a27dc9d720a960a661524c803a298072deca10089dbe28255404ca8a76e
 
     printf("decrypted(128): %s\n", dec128.toPlainText().c_str());
     printf("decrypted(192): %s\n", dec192.toPlainText().c_str());

@@ -6,6 +6,7 @@ const char key[] = "abcdefghijklmnop";
 int main()
 {
     Aes aes(Aes::AES_128, Aes::AES_CBC_Mode, ByteArray(key));
+    aes.setInitializationVector(ByteArray("1234567890123456"));
 
     ByteArray cipher = aes.encrypt(ByteArray(text));
     ByteArray text2 = aes.decrypt(cipher);

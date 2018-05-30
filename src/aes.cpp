@@ -95,7 +95,18 @@ ByteArray Aes::encrypt(const ByteArray& text)
 
 ByteArray Aes::decrypt(const ByteArray& cipher)
 {
-    return cipher;
+    assert(cipher.length() == Nb * 4);
+
+    ByteArray state = cipher;
+    addRoundKey(state, &m_w[Nr * 4]);
+    for (int i = Nr - 1; i >= 0; i--)
+    {
+        invShiftRows(state);
+        invSubBytes(state);
+        addRoundKey(state, &m_w[i * 4]);
+        if (i > 0) invMixColumns(state);
+    }
+    return state;
 }
 
 void Aes::addRoundKey(ByteArray& state, const uint32_t* roundKey) const
@@ -113,6 +124,12 @@ void Aes::subBytes(ByteArray& state) const
         state[i] = Utils::sub_byte(state[i], SBOX);
 }
 
+void Aes::invSubBytes(ByteArray& state) const
+{
+    for (int i = 0; i < Nb * 4; i++)
+        state[i] = Utils::sub_byte(state[i], ISBOX);
+}
+
 void Aes::shiftRows(ByteArray& state) const
 {
     assert(Nb == 4);
@@ -120,6 +137,17 @@ void Aes::shiftRows(ByteArray& state) const
     state[1] = state[5], state[5] = state[9], state[9] = state[13], state[13] = tmp;
     tmp = state[3];
     state[3] = state[15], state[15] = state[11], state[11] = state[7], state[7] = tmp;
+    tmp = state[2], state[2] = state[10], state[10] = tmp;
+    tmp = state[6], state[6] = state[14], state[14] = tmp;
+}
+
+void Aes::invShiftRows(ByteArray& state) const
+{
+    assert(Nb == 4);
+    uint8_t tmp = state[1];
+    state[1] = state[13], state[13] = state[9], state[9] = state[5], state[5] = tmp;
+    tmp = state[3];
+    state[3] = state[7], state[7] = state[11], state[11] = state[15], state[15] = tmp;
     tmp = state[2], state[2] = state[10], state[10] = tmp;
     tmp = state[6], state[6] = state[14], state[14] = tmp;
 }
@@ -134,10 +162,30 @@ void Aes::mixColumns(ByteArray& state) const
         uint8_t c = state[i + 2];
         uint8_t d = state[i + 3];
         uint8_t e = a ^ b ^ c ^ d;
+
         state[i] ^= e ^ Utils::xtime(a ^ b);
         state[i + 1] ^= e ^ Utils::xtime(b ^ c);
         state[i + 2] ^= e ^ Utils::xtime(c ^ d);
         state[i + 3] ^= e ^ Utils::xtime(d ^ a);
+    }
+}
+
+void Aes::invMixColumns(ByteArray& state) const
+{
+    assert(Nb == 4);
+    for (int i = 0; i < Nb * 4; i += 4)
+    {
+        uint8_t a = state[i];
+        uint8_t b = state[i + 1];
+        uint8_t c = state[i + 2];
+        uint8_t d = state[i + 3];
+        uint8_t e = a ^ b ^ c ^ d, e2 = Utils::xtime(e);
+        uint8_t ac = Utils::xtime(e2 ^ a ^ c), bd = Utils::xtime(e2 ^ b ^ d);
+
+        state[i] ^= e ^ Utils::xtime(a ^ b ^ ac);
+        state[i + 1] ^= e ^ Utils::xtime(b ^ c ^ bd);
+        state[i + 2] ^= e ^ Utils::xtime(c ^ d ^ ac);
+        state[i + 3] ^= e ^ Utils::xtime(d ^ a ^ bd);
     }
 }
 

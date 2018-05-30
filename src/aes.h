@@ -40,9 +40,14 @@ private:
     void keyExpansion(const ByteArray& key);
 
     void addRoundKey(ByteArray& state, const uint32_t* roundKey) const;
+
     void subBytes(ByteArray& state) const;
     void shiftRows(ByteArray& state) const;
     void mixColumns(ByteArray& state) const;
+
+    void invSubBytes(ByteArray& state) const;
+    void invShiftRows(ByteArray& state) const;
+    void invMixColumns(ByteArray& state) const;
 
     void printState(const ByteArray& state) const;
 };

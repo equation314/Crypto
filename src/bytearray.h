@@ -25,6 +25,8 @@ public:
 
     int length() const { return m_len; }
 
+    bool isError() const { return m_len < 0; }
+
     ByteArray padding(int len, uint8_t value = 0) const;
 
     std::string toPlainText() const;
@@ -36,6 +38,7 @@ public:
     uint8_t& operator[](int i) { return m_a[i]; }
     const uint8_t& operator[](int i) const { return m_a[i]; }
 
+    static ByteArray errorArray();
     static ByteArray fromFile(const char* fileName);
     static ByteArray fromHexString(const char* str);
     static void copy(const ByteArray& a, int sa, const ByteArray& b, int sb, int len);

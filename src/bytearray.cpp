@@ -98,6 +98,13 @@ void ByteArray::saveToFile(const char* fileName) const
     fclose(file);
 }
 
+ByteArray ByteArray::errorArray()
+{
+    ByteArray array;
+    array.m_len = -1;
+    return array;
+}
+
 ByteArray ByteArray::fromFile(const char* fileName)
 {
     FILE* file = fopen(fileName, "rb");

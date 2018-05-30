@@ -136,7 +136,7 @@ ByteArray Aes::decrypt(const ByteArray& cipher) const
 
     int padding = validatePadding(state);
     if (padding < 0)
-        return ByteArray("ERROR");
+        return ByteArray::errorArray();
     else
         state.clip(state.length() - padding);
 

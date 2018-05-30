@@ -87,6 +87,45 @@ std::string ByteArray::toHexString() const
     return str;
 }
 
+void ByteArray::saveToFile(const char* fileName) const
+{
+    FILE* file = fopen(fileName, "wb");
+
+    const int BUF_SIZE = 1 << 20;
+    for (int i = 0; i < m_len; i += BUF_SIZE)
+        fwrite(m_a + i, sizeof(uint8_t), std::min(BUF_SIZE, m_len - i), file);
+
+    fclose(file);
+}
+
+ByteArray ByteArray::fromFile(const char* fileName)
+{
+    FILE* file = fopen(fileName, "rb");
+    if (file == NULL)
+        return ByteArray();
+
+    fseek(file, 0, SEEK_END);
+    int size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    const int BUF_SIZE = 1 << 20;
+    ByteArray array(size);
+    for (int i = 0; i < size; i += BUF_SIZE)
+        fread(array.m_a + i, sizeof(uint8_t), BUF_SIZE, file);
+    fclose(file);
+
+    return array;
+}
+
+ByteArray ByteArray::fromHexString(const char* str)
+{
+    int len = strlen(str) / 2;
+    ByteArray array(len);
+    for (int i = 0; i < len; i++)
+        array[i] = Utils::hex2byte(str[i * 2], str[i * 2 + 1]);
+    return array;
+}
+
 void ByteArray::copy(const ByteArray& a, int sa, const ByteArray& b, int sb, int len)
 {
     memcpy(a.m_a + sa, b.m_a + sb, len * sizeof(uint8_t));

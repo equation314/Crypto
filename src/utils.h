@@ -9,6 +9,16 @@ typedef unsigned int uint32_t;
 
 namespace Utils
 {
+inline uint8_t from_hex(char hex)
+{
+    if ('0' <= hex && hex <= '9')
+        return hex - 48;
+    else if ('a' <= hex && hex <= 'f')
+        return hex - 87;
+    else
+        return 0;
+}
+
 inline char hex(uint8_t bit4)
 {
     return bit4 < 10 ? 48 + bit4 : 87 + bit4;
@@ -18,6 +28,11 @@ inline std::string byte2hex(uint8_t byte)
 {
     const char str[] = {hex(byte >> 4), hex(byte & 0xf), '\0'};
     return str;
+}
+
+inline uint8_t hex2byte(char high, char low)
+{
+    return (from_hex(high) << 4) | from_hex(low);
 }
 
 inline uint8_t word2byte(uint32_t word, int n)

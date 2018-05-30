@@ -15,9 +15,9 @@ int main()
     ByteArray cipher192 = aes192.encrypt(ByteArray(input));
     ByteArray cipher256 = aes256.encrypt(ByteArray(input));
 
-    ByteArray dec128 = aes128.decrypt(cipher128);
-    ByteArray dec192 = aes192.decrypt(cipher192);
-    ByteArray dec256 = aes256.decrypt(cipher256);
+    ByteArray dec128 = aes128.decrypt(ByteArray::fromHexString(cipher128.toHexString().c_str()));
+    ByteArray dec192 = aes192.decrypt(ByteArray::fromHexString(cipher192.toHexString().c_str()));
+    ByteArray dec256 = aes256.decrypt(ByteArray::fromHexString(cipher256.toHexString().c_str()));
 
     printf("input: %s\n", ByteArray(input).toPlainText().c_str());
 

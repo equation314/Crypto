@@ -31,9 +31,13 @@ public:
 
     std::string toHexString() const;
 
+    void saveToFile(const char* fileName) const;
+
     uint8_t& operator[](int i) { return m_a[i]; }
     const uint8_t& operator[](int i) const { return m_a[i]; }
 
+    static ByteArray fromFile(const char* fileName);
+    static ByteArray fromHexString(const char* str);
     static void copy(const ByteArray& a, int sa, const ByteArray& b, int sb, int len);
 
 private:

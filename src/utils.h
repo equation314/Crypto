@@ -46,6 +46,11 @@ inline uint32_t sub_word(uint32_t word, const uint8_t sbox[16][16])
                      sub_byte(word2byte(word, 1), sbox), sub_byte(word2byte(word, 0), sbox));
 }
 
+inline uint8_t xtime(uint8_t x)
+{
+    return (x & 0x80) ? ((x << 1) ^ 0x1b) : (x << 1);
+}
+
 }; // namespace Utils
 
 #endif // _UTILS_H

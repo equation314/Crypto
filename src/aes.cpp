@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "aes.h"
 
 const uint8_t Aes::SBOX[16][16] = {
@@ -75,18 +77,74 @@ Aes::~Aes()
         delete[] m_w;
 }
 
-ByteArray Aes::encode(const ByteArray& text)
+ByteArray Aes::encrypt(const ByteArray& text)
 {
-    return text;
+    assert(text.length() == Nb * 4);
+
+    ByteArray state = text;
+    addRoundKey(state, &m_w[0]);
+    for (int i = 1; i <= Nr; i++)
+    {
+        subBytes(state);
+        shiftRows(state);
+        if (i < Nr) mixColumns(state);
+        addRoundKey(state, &m_w[i * 4]);
+    }
+    return state;
 }
 
-ByteArray Aes::decode(const ByteArray& cipher)
+ByteArray Aes::decrypt(const ByteArray& cipher)
 {
     return cipher;
 }
 
+void Aes::addRoundKey(ByteArray& state, const uint32_t* roundKey) const
+{
+    for (int i = 0; i < Nb; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            state[i * 4 + j] ^= Utils::word2byte(roundKey[i], 3 - j);
+    }
+}
+
+void Aes::subBytes(ByteArray& state) const
+{
+    for (int i = 0; i < Nb * 4; i++)
+        state[i] = Utils::sub_byte(state[i], SBOX);
+}
+
+void Aes::shiftRows(ByteArray& state) const
+{
+    assert(Nb == 4);
+    uint8_t tmp = state[1];
+    state[1] = state[5], state[5] = state[9], state[9] = state[13], state[13] = tmp;
+    tmp = state[3];
+    state[3] = state[15], state[15] = state[11], state[11] = state[7], state[7] = tmp;
+    tmp = state[2], state[2] = state[10], state[10] = tmp;
+    tmp = state[6], state[6] = state[14], state[14] = tmp;
+}
+
+void Aes::mixColumns(ByteArray& state) const
+{
+    assert(Nb == 4);
+    for (int i = 0; i < Nb * 4; i += 4)
+    {
+        uint8_t a = state[i];
+        uint8_t b = state[i + 1];
+        uint8_t c = state[i + 2];
+        uint8_t d = state[i + 3];
+        uint8_t e = a ^ b ^ c ^ d;
+        state[i] ^= e ^ Utils::xtime(a ^ b);
+        state[i + 1] ^= e ^ Utils::xtime(b ^ c);
+        state[i + 2] ^= e ^ Utils::xtime(c ^ d);
+        state[i + 3] ^= e ^ Utils::xtime(d ^ a);
+    }
+}
+
 void Aes::keyExpansion(const ByteArray& key)
 {
+    assert(key.length() == Nk * 4);
+
     int len = Nb * (Nr + 1);
     m_w = new uint32_t[len];
     int i = 0;
@@ -101,4 +159,15 @@ void Aes::keyExpansion(const ByteArray& key)
             temp = Utils::sub_word(temp, SBOX);
         m_w[i] = m_w[i - Nk] ^ temp;
     }
+}
+
+void Aes::printState(const ByteArray& state) const
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < Nb; j++)
+            printf("  0x%02x", state[j * 4 + i]);
+        printf("\n");
+    }
+    printf("\n");
 }

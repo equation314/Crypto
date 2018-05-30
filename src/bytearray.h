@@ -37,6 +37,7 @@ public:
 
     uint8_t& operator[](int i) { return m_a[i]; }
     const uint8_t& operator[](int i) const { return m_a[i]; }
+    bool operator==(const ByteArray& array) const;
 
     static ByteArray errorArray();
     static ByteArray fromFile(const char* fileName);

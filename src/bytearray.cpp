@@ -98,6 +98,16 @@ void ByteArray::saveToFile(const char* fileName) const
     fclose(file);
 }
 
+bool ByteArray::operator==(const ByteArray& array) const
+{
+    if (m_len != array.m_len)
+        return false;
+    for (int i = 0; i < m_len; i++)
+        if (m_a[i] != array[i])
+            return false;
+    return true;
+}
+
 ByteArray ByteArray::errorArray()
 {
     ByteArray array;

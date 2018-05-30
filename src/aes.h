@@ -29,6 +29,15 @@ public:
     ByteArray decode(const ByteArray& cipher);
 
 private:
+    static const uint8_t SBOX[16][16];
+    static const uint8_t ISBOX[16][16];
+    static const uint32_t RCON[10];
+
+    int Nk, Nb, Nr;
+    AESMode m_mode;
+    uint32_t* m_w;
+
+    void keyExpansion(const ByteArray& key);
 };
 
 #endif // _AES_H

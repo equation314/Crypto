@@ -23,6 +23,9 @@ public:
 
     std::string toHexString() const;
 
+    uint8_t& operator[](int i) { return m_a[i]; }
+    const uint8_t& operator[](int i) const { return m_a[i]; }
+
 private:
     int m_len;
     uint8_t* m_a;

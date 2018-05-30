@@ -20,6 +20,32 @@ inline std::string byte2hex(uint8_t byte)
     return str;
 }
 
+inline uint8_t word2byte(uint32_t word, int n)
+{
+    return (word >> (n * 8)) & 0xff;
+}
+
+inline uint32_t byte2word(uint8_t b24_31, uint8_t b16_23, uint8_t b8_15, uint8_t b0_7)
+{
+    return (b24_31 << 24) | (b16_23 << 16) | (b8_15 << 8) | b0_7;
+}
+
+inline uint32_t rot_word(uint32_t word)
+{
+    return (word << 8) | (word >> 24);
+}
+
+inline uint8_t sub_byte(uint8_t byte, const uint8_t sbox[16][16])
+{
+    return sbox[byte >> 4][byte & 0xf];
+}
+
+inline uint32_t sub_word(uint32_t word, const uint8_t sbox[16][16])
+{
+    return byte2word(sub_byte(word2byte(word, 3), sbox), sub_byte(word2byte(word, 2), sbox),
+                     sub_byte(word2byte(word, 1), sbox), sub_byte(word2byte(word, 0), sbox));
+}
+
 }; // namespace Utils
 
 #endif // _UTILS_H

@@ -58,6 +58,7 @@ Aes::Aes(AESKeyLength keyLength, AESMode mode, const ByteArray& key)
 {
     switch (keyLength)
     {
+    default:
     case AES_128:
         Nk = 4, Nb = 4, Nr = 10;
         break;
@@ -67,8 +68,9 @@ Aes::Aes(AESKeyLength keyLength, AESMode mode, const ByteArray& key)
     case AES_256:
         Nk = 8, Nb = 4, Nr = 14;
         break;
+        break;
     }
-    keyExpansion(key);
+    keyExpansion(key.length() >= Nk * 4 ? key : key.padding(Nk * 4));
 }
 
 Aes::~Aes()
@@ -191,7 +193,7 @@ void Aes::invMixColumns(ByteArray& state) const
 
 void Aes::keyExpansion(const ByteArray& key)
 {
-    assert(key.length() == Nk * 4);
+    assert(key.length() >= Nk * 4);
 
     int len = Nb * (Nr + 1);
     m_w = new uint32_t[len];

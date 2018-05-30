@@ -14,10 +14,13 @@ ByteArray::ByteArray(const char* str)
     memcpy(m_a, str, m_len * sizeof(uint8_t));
 }
 
-ByteArray::ByteArray(const uint8_t* array, int len)
+ByteArray::ByteArray(int len, const uint8_t* array)
     : m_len(len), m_a(new uint8_t[len])
 {
-    memcpy(m_a, array, m_len * sizeof(uint8_t));
+    if (array)
+        memcpy(m_a, array, m_len * sizeof(uint8_t));
+    else
+        memset(m_a, 0, m_len * sizeof(uint8_t));
 }
 
 ByteArray::ByteArray(const ByteArray& array)
@@ -49,6 +52,16 @@ ByteArray& ByteArray::operator=(ByteArray&& array)
         array.m_a = nullptr;
     }
     return *this;
+}
+
+ByteArray ByteArray::padding(int len, uint8_t value) const
+{
+    if (m_len >= len)
+        return *this;
+    ByteArray array(len);
+    memcpy(array.m_a, m_a, m_len * sizeof(uint8_t));
+    memset(array.m_a + m_len, value, (len - m_len) * sizeof(uint8_t));
+    return array;
 }
 
 std::string ByteArray::toPlainText() const

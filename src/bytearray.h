@@ -10,7 +10,7 @@ class ByteArray
 public:
     ByteArray();
     ByteArray(const char* str);
-    ByteArray(const uint8_t* array, int len);
+    ByteArray(int len, const uint8_t* array = nullptr);
     ByteArray(const ByteArray& array);
     ByteArray(ByteArray&& array);
     virtual ~ByteArray();
@@ -18,6 +18,8 @@ public:
     ByteArray& operator=(ByteArray&& array);
 
     int length() const { return m_len; }
+
+    ByteArray padding(int len, uint8_t value = 0) const;
 
     std::string toPlainText() const;
 

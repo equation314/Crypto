@@ -3,7 +3,6 @@
 
 namespace Const
 {
-
-};
+}; // namespace Const
 
 #endif // _CONST_H

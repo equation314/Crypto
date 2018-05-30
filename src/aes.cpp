@@ -10,8 +10,10 @@ Aes::~Aes()
 
 ByteArray Aes::encode(const ByteArray& text)
 {
+    return text;
 }
 
 ByteArray Aes::decode(const ByteArray& cipher)
 {
+    return cipher;
 }

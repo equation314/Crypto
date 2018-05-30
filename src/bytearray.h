@@ -8,9 +8,14 @@
 class ByteArray
 {
 public:
+    ByteArray();
     ByteArray(const char* str);
     ByteArray(const uint8_t* array, int len);
+    ByteArray(const ByteArray& array);
+    ByteArray(ByteArray&& array);
     virtual ~ByteArray();
+
+    ByteArray& operator=(ByteArray&& array);
 
     int length() const { return m_len; }
 
@@ -19,8 +24,8 @@ public:
     std::string toHexString() const;
 
 private:
-    const uint8_t* m_a;
     int m_len;
+    uint8_t* m_a;
 };
 
 #endif // _BYTE_ARRAY_H

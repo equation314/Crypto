@@ -51,4 +51,5 @@ const uint32_t Aes::RCON[10] = {
     0x1b000000,
     0x36000000,
 };
-#endif
+
+#endif // _AES_CONST_H

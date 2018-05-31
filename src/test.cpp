@@ -38,27 +38,43 @@ void testcase1()
                    "69937a27dc9d720a960a661524c803a2398fe0a2e0369f6b6714679941e06c8b"));
 
     printf("decrypted(128): %s\n", dec128.toPlainText().c_str());
+    assert(!strcmp(dec128.toPlainText().c_str(), "abcdefghijklmnop"));
+
     printf("decrypted(192): %s\n", dec192.toPlainText().c_str());
+    assert(!strcmp(dec192.toPlainText().c_str(), "abcdefghijklmnop"));
+
     printf("decrypted(256): %s\n", dec256.toPlainText().c_str());
+    assert(!strcmp(dec256.toPlainText().c_str(), "abcdefghijklmnop"));
 }
 
 void testcase2()
 {
-    const int round = 1000;
-    const std::string fileName = "../aes.cpp";
+    const int round = 10;
+    const std::string fileName = "input100m.bin";
     const char key_128[] = "3141592653589793";
 
     Aes aes128(Aes::AES_128, ByteArray(key_128));
     ByteArray input = ByteArray::fromFile(fileName.c_str());
     ByteArray output = input;
 
+    long long size = 0;
+    int begin = clock();
     for (int i = 0; i < round; i++)
+    {
+        size += output.length();
         output = aes128.encrypt(output);
-
-    output.saveToFile((fileName + ".enc").c_str());
+    }
 
     for (int i = 0; i < round; i++)
+    {
+        size += output.length();
         output = aes128.decrypt(output);
+    }
+
+    int end = clock();
+    double timeUsed = (1.0 * (end - begin) / CLOCKS_PER_SEC);
+    printf("Time: %.3lf s\n", timeUsed);
+    printf("Speed: %.3lf MB/s\n", 1.0 * size / (1 << 20) / timeUsed);
 
     assert(input == output);
 }
@@ -75,7 +91,7 @@ int main()
         int begin = clock();
         testcases[i]();
         int end = clock();
-        printf("testcase #2 passed. (%.3lfs)\n", 1.0 * (end - begin) / CLOCKS_PER_SEC);
+        printf("testcase #%d passed. (%.3lfs)\n", i, 1.0 * (end - begin) / CLOCKS_PER_SEC);
     }
     return 0;
 }

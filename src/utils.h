@@ -45,25 +45,31 @@ inline uint32_t byte2word(uint8_t b24_31, uint8_t b16_23, uint8_t b8_15, uint8_t
     return (b24_31 << 24) | (b16_23 << 16) | (b8_15 << 8) | b0_7;
 }
 
-inline uint32_t rot_word(uint32_t word)
+inline uint32_t rot_left(uint32_t word, uint8_t n)
 {
-    return (word << 8) | (word >> 24);
+    return (word << n) | (word >> (32 - n));
 }
 
-inline uint8_t sub_byte(uint8_t byte, const uint8_t sbox[16][16])
+inline uint32_t rot_right(uint32_t word, uint8_t n)
 {
-    return sbox[byte >> 4][byte & 0xf];
+    return rot_left(word, 32 - n);
 }
 
-inline uint32_t sub_word(uint32_t word, const uint8_t sbox[16][16])
+inline uint8_t sub_byte(uint8_t byte, const uint8_t* sbox)
+{
+    return sbox[byte];
+}
+
+inline uint32_t sub_word(uint32_t word, const uint8_t* sbox)
 {
     return byte2word(sub_byte(word2byte(word, 3), sbox), sub_byte(word2byte(word, 2), sbox),
                      sub_byte(word2byte(word, 1), sbox), sub_byte(word2byte(word, 0), sbox));
 }
 
-inline uint8_t xtime(uint8_t x)
+inline uint32_t reverse_word(uint32_t word)
 {
-    return (x & 0x80) ? ((x << 1) ^ 0x1b) : (x << 1);
+    return byte2word(word2byte(word, 0), word2byte(word, 1),
+                     word2byte(word, 2), word2byte(word, 3));
 }
 
 }; // namespace Utils

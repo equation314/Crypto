@@ -39,31 +39,25 @@ public:
     ByteArray decrypt(const ByteArray& cipher) const;
 
 private:
-    static const uint8_t SBOX[16][16];
-    static const uint8_t ISBOX[16][16];
+    static const uint8_t SBOX[0x100];
+    static const uint8_t ISBOX[0x100];
     static const uint32_t RCON[10];
 
     int Nk, Nb, Nr, m_block_bytes;
     AESMode m_mode;
     uint32_t* m_w;
+    uint32_t* m_dw;
     ByteArray m_iv;
+
+    void fillEncTable() const;
+    void fillDecTable() const;
+    uint32_t invMixColumns(uint32_t x) const;
+    void keyExpansion(const ByteArray& key);
 
     void encryptOneBlock(uint8_t* state) const;
     void decryptOneBlock(uint8_t* state) const;
 
     int validatePadding(const ByteArray& text) const;
-
-    void keyExpansion(const ByteArray& key);
-
-    void addRoundKey(uint8_t* state, const uint32_t* roundKey) const;
-
-    void subBytes(uint8_t* state) const;
-    void shiftRows(uint8_t* state) const;
-    void mixColumns(uint8_t* state) const;
-
-    void invSubBytes(uint8_t* state) const;
-    void invShiftRows(uint8_t* state) const;
-    void invMixColumns(uint8_t* state) const;
 
     void printState(const uint8_t* state) const;
 };

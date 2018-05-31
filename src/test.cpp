@@ -74,7 +74,7 @@ void testcase2()
     int end = clock();
     double timeUsed = (1.0 * (end - begin) / CLOCKS_PER_SEC);
     printf("Time: %.3lf s\n", timeUsed);
-    printf("Speed: %.3lf MB/s\n", 1.0 * size / (1 << 20) / timeUsed);
+    printf("Speed: %.3lf MiB/s\n", 1.0 * size / (1 << 20) / timeUsed);
 
     assert(input == output);
 }

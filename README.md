@@ -1,6 +1,6 @@
 # Projects of Modern Cryptography
 
-Implementation of AES & keccak algorithms.
+Implementation of AES and keccak algorithms.
 
 ## Build
 
@@ -34,6 +34,7 @@ Options:
     ```
     ./testaes
     ```
+
 3. The output will look like the following:
 
     ```
@@ -46,6 +47,6 @@ Options:
     decrypted(256): abcdefghijklmnop
     testcase #0 passed. (0.000s)
     Time: 9.461 s
-    Speed: 211.399 MB/s
+    Speed: 211.399 MiB/s
     testcase #1 passed. (9.687s)
     ```

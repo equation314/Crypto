@@ -1,15 +1,32 @@
 #include "sha3.h"
 #include "sha3const.h"
 
-Sha3::Sha3()
+Sha3::Sha3(SHA3DigestSize digestSize)
 {
+    switch (digestSize)
+    {
+    case SHA3_224:
+        m_digest_size = 28;
+        break;
+    default:
+    case SHA3_256:
+        m_digest_size = 32;
+        break;
+    case SHA3_384:
+        m_digest_size = 48;
+        break;
+    case SHA3_512:
+        m_digest_size = 64;
+        break;
+    }
+    m_r = 200 - m_digest_size * 2;
 }
 
 Sha3::~Sha3()
 {
 }
 
-void Sha3::keccak_f(uint64_t* state)
+void Sha3::keccakF1600(uint64_t* state)
 {
 #define A(x, y) state[(y) *5 + (x)]
 
@@ -228,36 +245,22 @@ void Sha3::keccak_f(uint64_t* state)
 #undef A
 }
 
-ByteArray paddingBuffer(const ByteArray& buffer, uint8_t align)
-{
-    int padding = align - buffer.length() % align;
-    ByteArray padBuffer(buffer.length() + padding);
-    ByteArray::copy(padBuffer, 0, buffer, 0, buffer.length());
-
-    padBuffer[buffer.length()] = 0x01;
-    padBuffer[padBuffer.length() - 1] ^= 0x80;
-    return padBuffer;
-}
-
 ByteArray Sha3::hash(const ByteArray& buf)
 {
-    const int output_size = 512;
-    const int c = output_size * 2;
-    const int r = (1600 - c) / 8;
-    const int r_len = r / sizeof(uint64_t);
-
-    ByteArray buffer = paddingBuffer(buf, r);
-    uint64_t* ptr = (uint64_t*) &buffer[0];
     memset(m_state, 0, sizeof(m_state));
 
-    for (int i = 0; i < buffer.length() / r; i++)
+    const int r_len = m_r / sizeof(uint64_t);
+    ByteArray buffer = buf.padding101(m_r);
+    uint64_t* ptr = (uint64_t*) &buffer[0];
+
+    for (int i = 0; i < buffer.length(); i += m_r, ptr += r_len)
     {
         for (int j = 0; j < r_len; j++)
-            m_state[j] ^= ptr[i * r_len + j];
-        keccak_f(m_state);
+            m_state[j] ^= ptr[j];
+        keccakF1600(m_state);
     }
 
-    ByteArray output(output_size / sizeof(uint64_t));
+    ByteArray output(m_digest_size);
     ptr = (uint64_t*) &output[0];
 
     for (int t = 0; t < 8;)

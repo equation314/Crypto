@@ -61,13 +61,22 @@ ByteArray& ByteArray::operator=(ByteArray&& array)
     return *this;
 }
 
-ByteArray ByteArray::padding(int len, uint8_t value) const
+ByteArray ByteArray::padding(uint8_t align, uint8_t value) const
 {
-    if (m_len >= len)
-        return *this;
-    ByteArray array(len);
+    int pad = align - m_len % align;
+    ByteArray array(m_len + pad);
     memcpy(array.m_a, m_a, m_len * sizeof(uint8_t));
-    memset(array.m_a + m_len, value, (len - m_len) * sizeof(uint8_t));
+    memset(array.m_a + m_len, value, pad * sizeof(uint8_t));
+    return array;
+}
+
+ByteArray ByteArray::padding101(uint8_t align) const
+{
+    int pad = align - m_len % align;
+    ByteArray array(m_len + pad);
+    memcpy(array.m_a, m_a, m_len * sizeof(uint8_t));
+    array[m_len] = 0x01;
+    array[array.m_len - 1] ^= 0x80;
     return array;
 }
 

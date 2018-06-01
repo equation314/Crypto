@@ -18,7 +18,7 @@ public:
     ByteArray& operator=(const ByteArray& array);
     ByteArray& operator=(ByteArray&& array);
 
-    void clip(int size)
+    void trunc(int size)
     {
         if (size < m_len) m_len = size;
     }
@@ -27,7 +27,9 @@ public:
 
     bool isError() const { return m_len < 0; }
 
-    ByteArray padding(int len, uint8_t value = 0) const;
+    ByteArray padding(uint8_t align, uint8_t value = 0) const;
+
+    ByteArray padding101(uint8_t align) const;
 
     std::string toPlainText() const;
 

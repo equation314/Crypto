@@ -39,11 +39,8 @@ Aes::~Aes()
 
 ByteArray Aes::encrypt(const ByteArray& text) const
 {
-    int padding = m_block_bytes - text.length() % m_block_bytes;
-    ByteArray state(text.length() + padding);
-    ByteArray::copy(state, 0, text, 0, text.length());
-    for (int i = text.length(); i < state.length(); i++)
-        state[i] = padding;
+    int pad = m_block_bytes - text.length() % m_block_bytes;
+    ByteArray state = text.padding(m_block_bytes, pad);
 
     const uint8_t* last = &m_iv[0];
     switch (m_mode)
@@ -91,11 +88,11 @@ ByteArray Aes::decrypt(const ByteArray& cipher) const
         break;
     }
 
-    int padding = validatePadding(state);
-    if (padding < 0)
+    int pad = validatePadding(state);
+    if (pad < 0)
         return ByteArray::errorArray();
     else
-        state.clip(state.length() - padding);
+        state.trunc(state.length() - pad);
 
     return state;
 }
@@ -112,21 +109,21 @@ int Aes::validatePadding(const ByteArray& text) const
 void Aes::encryptOneBlock(uint8_t* state) const
 {
 #define QUARTER_ROUND_E(t, a, b, c, d) \
-    d ^= Te[(uint8_t) t + 3 * 256];     \
-    t >>= 8;                            \
-    c ^= Te[(uint8_t) t + 2 * 256];     \
-    t >>= 8;                            \
-    b ^= Te[(uint8_t) t + 1 * 256];     \
-    t >>= 8;                            \
+    d ^= Te[(uint8_t) t + 3 * 256];    \
+    t >>= 8;                           \
+    c ^= Te[(uint8_t) t + 2 * 256];    \
+    t >>= 8;                           \
+    b ^= Te[(uint8_t) t + 1 * 256];    \
+    t >>= 8;                           \
     a ^= Te[(uint8_t) t + 0 * 256]
 
 #define QUARTER_ROUND_E2(state, t, a, b, c, d) \
-    state[d] = SBOX[(uint8_t) t];               \
-    t >>= 8;                                    \
-    state[c] = SBOX[(uint8_t) t];               \
-    t >>= 8;                                    \
-    state[b] = SBOX[(uint8_t) t];               \
-    t >>= 8;                                    \
+    state[d] = SBOX[(uint8_t) t];              \
+    t >>= 8;                                   \
+    state[c] = SBOX[(uint8_t) t];              \
+    t >>= 8;                                   \
+    state[b] = SBOX[(uint8_t) t];              \
+    t >>= 8;                                   \
     state[a] = SBOX[(uint8_t) t]
 
     const uint32_t* rk = m_w;
@@ -178,21 +175,21 @@ void Aes::encryptOneBlock(uint8_t* state) const
 void Aes::decryptOneBlock(uint8_t* state) const
 {
 #define QUARTER_ROUND_D(t, a, b, c, d) \
-    d ^= Td[(uint8_t) t + 3 * 256];     \
-    t >>= 8;                            \
-    c ^= Td[(uint8_t) t + 2 * 256];     \
-    t >>= 8;                            \
-    b ^= Td[(uint8_t) t + 1 * 256];     \
-    t >>= 8;                            \
+    d ^= Td[(uint8_t) t + 3 * 256];    \
+    t >>= 8;                           \
+    c ^= Td[(uint8_t) t + 2 * 256];    \
+    t >>= 8;                           \
+    b ^= Td[(uint8_t) t + 1 * 256];    \
+    t >>= 8;                           \
     a ^= Td[(uint8_t) t + 0 * 256]
 
 #define QUARTER_ROUND_D2(state, t, a, b, c, d) \
-    state[d] = ISBOX[(uint8_t) t];              \
-    t >>= 8;                                    \
-    state[c] = ISBOX[(uint8_t) t];              \
-    t >>= 8;                                    \
-    state[b] = ISBOX[(uint8_t) t];              \
-    t >>= 8;                                    \
+    state[d] = ISBOX[(uint8_t) t];             \
+    t >>= 8;                                   \
+    state[c] = ISBOX[(uint8_t) t];             \
+    t >>= 8;                                   \
+    state[b] = ISBOX[(uint8_t) t];             \
+    t >>= 8;                                   \
     state[a] = ISBOX[(uint8_t) t]
 
     const uint32_t* rk = m_dw;

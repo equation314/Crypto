@@ -80,19 +80,18 @@ void testcase2()
     assert(input == output);
 }
 
-
 void testcase_sha3_1()
 {
     Sha3 sha3;
     ByteArray output = sha3.hash(ByteArray("The quick brown fox jumps over the lazy dog"));
     printf("%s\n", output.toHexString().c_str());
     assert(!strcmp(output.toHexString().c_str(),
-        "d135bb84d0439dbac432247ee573a23ea7d3c9deb2a968eb31d47c4fb45f1ef4422d6c531b5b9bd6f449ebcc449ea94d0a8f05f62130fda612da53c79659f609"));
+                   "d135bb84d0439dbac432247ee573a23ea7d3c9deb2a968eb31d47c4fb45f1ef4422d6c531b5b9bd6f449ebcc449ea94d0a8f05f62130fda612da53c79659f609"));
 }
 
 void testcase_sha3_2()
 {
-    const int round = 5;
+    const int round = 10;
     const std::string fileName = "input100m.bin";
 
     Sha3 sha3;
@@ -116,8 +115,8 @@ void testcase_sha3_2()
 int main()
 {
     void (*testcases[])() = {
-        testcase_sha3_2,
         testcase_sha3_1,
+        testcase_sha3_2,
         testcase1,
         testcase2,
     };

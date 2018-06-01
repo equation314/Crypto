@@ -12,9 +12,11 @@ public:
     ByteArray hash(const ByteArray& buffer);
 
 private:
-    // uint64_t m_state[5][5];
+    static const uint64_t ROUND_CONST[24];
 
-    void keccak_f(uint64_t A[5][5]);
+    uint64_t m_state[25];
+
+    void keccak_f(uint64_t* state);
 };
 
 #endif // _SHA3_H

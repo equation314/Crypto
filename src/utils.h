@@ -56,6 +56,11 @@ inline uint32_t rot_right(uint32_t word, uint8_t n)
     return rot_left(word, 32 - n);
 }
 
+inline uint64_t rot_left(uint64_t qword, uint8_t n)
+{
+    return (qword << n) | (qword >> (64 - n));
+}
+
 inline uint8_t sub_byte(uint8_t byte, const uint8_t* sbox)
 {
     return sbox[byte];

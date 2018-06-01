@@ -51,11 +51,14 @@ void test_aes_1()
 void test_aes_2()
 {
     const int round = 10;
-    const std::string fileName = "input100m.bin";
     const char key_128[] = "3141592653589793";
 
     Aes aes128(Aes::AES_128, ByteArray(key_128));
-    ByteArray input = ByteArray::fromFile(fileName.c_str());
+    ByteArray input(100 << 20);
+
+    for (int i = 0; i < input.length(); i++)
+        input[i] = 'a';
+
     ByteArray output = input;
 
     long long size = 0;
@@ -140,11 +143,13 @@ void test_sha3_1()
 void test_sha3_2()
 {
     const int round = 20;
-    const std::string fileName = "input100m.bin";
 
     Sha3 sha3(Sha3::SHA3_256);
-    ByteArray input = ByteArray::fromFile(fileName.c_str());
+    ByteArray input(100 << 20);
     ByteArray output;
+
+    for (int i = 0; i < input.length(); i++)
+        input[i] = 'a';
 
     long long size = 0;
     int begin = clock();
@@ -156,8 +161,11 @@ void test_sha3_2()
 
     int end = clock();
     double timeUsed = (1.0 * (end - begin) / CLOCKS_PER_SEC);
+    printf("%s\n", output.toHexString().c_str());
     printf("Time: %.3lf s\n", timeUsed);
     printf("Speed: %.3lf MiB/s\n", 1.0 * size / (1 << 20) / timeUsed);
+
+    assert(output.toHexString() == "844b5322b109fe26cc3668a18a2d9bf7afd5340c246a9fee4e3cba547471ef29");
 }
 
 int main()

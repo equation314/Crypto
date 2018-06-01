@@ -2,7 +2,7 @@
 
 void showHelp(const char* argv0)
 {
-    printf("Usage: %s [options]>\n"
+    printf("Usage: %s [options]\n"
            "Options:\n"
            "  -m <MESSAGE>              Print the SHA-3 checksum of message <MESSAGE>.\n"
            "  -f <FILE>                 Print the SHA-3 checksum of file <FILE>.\n"

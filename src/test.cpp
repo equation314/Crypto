@@ -103,15 +103,15 @@ void test_sha3_1()
     assert(!strcmp(d224.toHexString().c_str(),
                    "6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7"));
 
-    printf("SHA3_256: %s\n", d256.toHexString().c_str());
+    printf("SHA3-256: %s\n", d256.toHexString().c_str());
     assert(!strcmp(d256.toHexString().c_str(),
                    "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"));
 
-    printf("SHA3_384: %s\n", d384.toHexString().c_str());
+    printf("SHA3-384: %s\n", d384.toHexString().c_str());
     assert(!strcmp(d384.toHexString().c_str(),
                    "0c63a75b845e4f7d01107d852e4c2485c51a50aaaa94fc61995e71bbee983a2ac3713831264adb47fb6bd1e058d5f004"));
 
-    printf("SHA3_512: %s\n", d512.toHexString().c_str());
+    printf("SHA3-512: %s\n", d512.toHexString().c_str());
     assert(!strcmp(d512.toHexString().c_str(),
                    "a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26"));
 
@@ -127,15 +127,15 @@ void test_sha3_1()
     assert(!strcmp(d224.toHexString().c_str(),
                    "8a24108b154ada21c9fd5574494479ba5c7e7ab76ef264ead0fcce33"));
 
-    printf("SHA3_256: %s\n", d256.toHexString().c_str());
+    printf("SHA3-256: %s\n", d256.toHexString().c_str());
     assert(!strcmp(d256.toHexString().c_str(),
                    "41c0dba2a9d6240849100376a8235e2c82e1b9998a999e21db32dd97496d3376"));
 
-    printf("SHA3_384: %s\n", d384.toHexString().c_str());
+    printf("SHA3-384: %s\n", d384.toHexString().c_str());
     assert(!strcmp(d384.toHexString().c_str(),
                    "991c665755eb3a4b6bbdfb75c78a492e8c56a22c5c4d7e429bfdbc32b9d4ad5aa04a1f076e62fea19eef51acd0657c22"));
 
-    printf("SHA3_512: %s\n", d512.toHexString().c_str());
+    printf("SHA3-512: %s\n", d512.toHexString().c_str());
     assert(!strcmp(d512.toHexString().c_str(),
                    "04a371e84ecfb5b8b77cb48610fca8182dd457ce6f326a0fd3d7ec2f1e91636dee691fbe0c985302ba1b0d8dc78c086346b533b49c030d99a27daf1139d6e75e"));
 }

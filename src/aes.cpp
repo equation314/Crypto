@@ -39,6 +39,9 @@ Aes::~Aes()
 
 ByteArray Aes::encrypt(const ByteArray& text) const
 {
+    if (text.isError())
+        return ByteArray::errorArray();
+
     int pad = m_block_bytes - text.length() % m_block_bytes;
     ByteArray state = text.padding(m_block_bytes, pad);
 
@@ -66,6 +69,9 @@ ByteArray Aes::encrypt(const ByteArray& text) const
 
 ByteArray Aes::decrypt(const ByteArray& cipher) const
 {
+    if (cipher.isError())
+        return ByteArray::errorArray();
+
     assert(cipher.length() % m_block_bytes == 0);
 
     const uint8_t* last = &m_iv[0];

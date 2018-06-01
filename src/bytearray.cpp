@@ -128,7 +128,7 @@ ByteArray ByteArray::fromFile(const char* fileName)
 {
     FILE* file = fopen(fileName, "rb");
     if (file == NULL)
-        return ByteArray();
+        return errorArray();
 
     fseek(file, 0, SEEK_END);
     int size = ftell(file);

@@ -85,8 +85,11 @@ int main(int argc, char* argv[])
         else if (!strcmp(argv[i], "--help"))
             showHelp(argv[0]);
     }
-    if (!key.length() || !inFile.length() || !outFile.length())
+    if (!key.length() || !inFile.length())
         showHelp(argv[0]);
+
+    if (!outFile.length())
+        outFile = inFile + (isEncryption ? ".enc" : ".dec");
 
     Aes aes(keyLength, ByteArray(key.c_str()), mode);
     aes.setInitializationVector(ByteArray("1234567890123456"));
@@ -103,7 +106,8 @@ int main(int argc, char* argv[])
     else
     {
         output.saveToFile(outFile.c_str());
-        printf("OK!\n");
+        printf("%s %s completed.\nThe output file is \"%s\"\n", aes.algorithmName().c_str(),
+               isEncryption ? "encryption" : "decryption", outFile.c_str());
     }
 
     return 0;

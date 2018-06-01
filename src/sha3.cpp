@@ -247,6 +247,9 @@ void Sha3::keccakF1600(uint64_t* state)
 
 ByteArray Sha3::hash(const ByteArray& message)
 {
+    if (message.isError())
+        return ByteArray::errorArray();
+
     memset(m_state, 0, sizeof(m_state));
 
     const int r_len = m_r / sizeof(uint64_t);

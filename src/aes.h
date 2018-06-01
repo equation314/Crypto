@@ -24,6 +24,13 @@ public:
     Aes(AESKeyLength keyLength, const ByteArray& key, AESMode mode = AES_CBC_Mode);
     virtual ~Aes();
 
+    std::string algorithmName() const
+    {
+        char str[256];
+        sprintf(str, "AES-%d-%s", Nk * 32, m_mode == AES_ECB_Mode ? "ECB" : "CBC");
+        return str;
+    }
+
     void setInitializationVector(const ByteArray& iv)
     {
         if (iv.length() != Nb * 4)

@@ -17,6 +17,13 @@ public:
     Sha3(SHA3DigestSize digestSize);
     virtual ~Sha3();
 
+    std::string algorithmName() const
+    {
+        char str[256];
+        sprintf(str, "SHA3-%d", m_digest_size * 8);
+        return str;
+    }
+
     ByteArray hash(const ByteArray& message);
 
 private:

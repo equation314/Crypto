@@ -139,10 +139,10 @@ void test_sha3_1()
 
 void test_sha3_2()
 {
-    const int round = 10;
+    const int round = 20;
     const std::string fileName = "input100m.bin";
 
-    Sha3 sha3(Sha3::SHA3_512);
+    Sha3 sha3(Sha3::SHA3_256);
     ByteArray input = ByteArray::fromFile(fileName.c_str());
     ByteArray output;
 

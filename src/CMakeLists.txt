@@ -8,11 +8,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O2 -O3 -Wall")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 set(SRCS bytearray.cpp aes.cpp sha3.cpp utils.h)
-add_library(aes ${SRCS})
+add_library(crypto ${SRCS})
 
-add_executable(mainaes main.cpp)
-target_link_libraries(mainaes aes)
+add_executable(aes main.cpp)
+target_link_libraries(aes crypto)
 
-add_executable(testaes test.cpp)
-target_link_libraries(testaes aes)
-# add_executable(test ${SRCS})
+add_executable(crypto_test test.cpp)
+target_link_libraries(crypto_test crypto)

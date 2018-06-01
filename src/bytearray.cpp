@@ -70,12 +70,12 @@ ByteArray ByteArray::padding(uint8_t align, uint8_t value) const
     return array;
 }
 
-ByteArray ByteArray::padding101(uint8_t align) const
+ByteArray ByteArray::padding10Star1(uint8_t align) const
 {
     int pad = align - m_len % align;
     ByteArray array(m_len + pad);
     memcpy(array.m_a, m_a, m_len * sizeof(uint8_t));
-    array[m_len] = 0x01;
+    array[m_len] ^= 0x06;
     array[array.m_len - 1] ^= 0x80;
     return array;
 }

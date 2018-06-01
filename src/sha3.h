@@ -17,7 +17,7 @@ public:
     Sha3(SHA3DigestSize digestSize);
     virtual ~Sha3();
 
-    ByteArray hash(const ByteArray& buffer);
+    ByteArray hash(const ByteArray& message);
 
 private:
     static const uint64_t ROUND_CONST[24];

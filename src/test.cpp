@@ -5,7 +5,7 @@
 #include "aes.h"
 #include "sha3.h"
 
-void testcase1()
+void test_aes_1()
 {
     const char input[] = "abcdefghijklmnop";
     const char key_128[] = "abcdefghijklmnop";
@@ -48,7 +48,7 @@ void testcase1()
     assert(!strcmp(dec256.toPlainText().c_str(), "abcdefghijklmnop"));
 }
 
-void testcase2()
+void test_aes_2()
 {
     const int round = 10;
     const std::string fileName = "input100m.bin";
@@ -80,16 +80,64 @@ void testcase2()
     assert(input == output);
 }
 
-void testcase_sha3_1()
+void test_sha3_1()
 {
-    Sha3 sha3(Sha3::SHA3_512);
-    ByteArray output = sha3.hash(ByteArray("The quick brown fox jumps over the lazy dog"));
-    printf("%s\n", output.toHexString().c_str());
-    assert(!strcmp(output.toHexString().c_str(),
-                   "d135bb84d0439dbac432247ee573a23ea7d3c9deb2a968eb31d47c4fb45f1ef4422d6c531b5b9bd6f449ebcc449ea94d0a8f05f62130fda612da53c79659f609"));
+    Sha3 sha3_224(Sha3::SHA3_224);
+    Sha3 sha3_256(Sha3::SHA3_256);
+    Sha3 sha3_384(Sha3::SHA3_384);
+    Sha3 sha3_512(Sha3::SHA3_512);
+    ByteArray message, d224, d256, d384, d512;
+
+    message = ByteArray("");
+    printf("message: %s\n", message.toPlainText().c_str());
+
+    d224 = sha3_224.hash(message);
+    d256 = sha3_256.hash(message);
+    d384 = sha3_384.hash(message);
+    d512 = sha3_512.hash(message);
+
+    printf("SHA3-224: %s\n", d224.toHexString().c_str());
+    assert(!strcmp(d224.toHexString().c_str(),
+                   "6b4e03423667dbb73b6e15454f0eb1abd4597f9a1b078e3f5b5a6bc7"));
+
+    printf("SHA3_256: %s\n", d256.toHexString().c_str());
+    assert(!strcmp(d256.toHexString().c_str(),
+                   "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a"));
+
+    printf("SHA3_384: %s\n", d384.toHexString().c_str());
+    assert(!strcmp(d384.toHexString().c_str(),
+                   "0c63a75b845e4f7d01107d852e4c2485c51a50aaaa94fc61995e71bbee983a2ac3713831264adb47fb6bd1e058d5f004"));
+
+    printf("SHA3_512: %s\n", d512.toHexString().c_str());
+    assert(!strcmp(d512.toHexString().c_str(),
+                   "a69f73cca23a9ac5c8b567dc185a756e97c982164fe25859e0d1dcc1475c80a615b2123af1f5f94c11e3e9402c3ac558f500199d95b6d3e301758586281dcd26"));
+
+    message = ByteArray("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
+    printf("message: %s\n", message.toPlainText().c_str());
+
+    d224 = sha3_224.hash(message);
+    d256 = sha3_256.hash(message);
+    d384 = sha3_384.hash(message);
+    d512 = sha3_512.hash(message);
+
+    printf("SHA3-224: %s\n", d224.toHexString().c_str());
+    assert(!strcmp(d224.toHexString().c_str(),
+                   "8a24108b154ada21c9fd5574494479ba5c7e7ab76ef264ead0fcce33"));
+
+    printf("SHA3_256: %s\n", d256.toHexString().c_str());
+    assert(!strcmp(d256.toHexString().c_str(),
+                   "41c0dba2a9d6240849100376a8235e2c82e1b9998a999e21db32dd97496d3376"));
+
+    printf("SHA3_384: %s\n", d384.toHexString().c_str());
+    assert(!strcmp(d384.toHexString().c_str(),
+                   "991c665755eb3a4b6bbdfb75c78a492e8c56a22c5c4d7e429bfdbc32b9d4ad5aa04a1f076e62fea19eef51acd0657c22"));
+
+    printf("SHA3_512: %s\n", d512.toHexString().c_str());
+    assert(!strcmp(d512.toHexString().c_str(),
+                   "04a371e84ecfb5b8b77cb48610fca8182dd457ce6f326a0fd3d7ec2f1e91636dee691fbe0c985302ba1b0d8dc78c086346b533b49c030d99a27daf1139d6e75e"));
 }
 
-void testcase_sha3_2()
+void test_sha3_2()
 {
     const int round = 10;
     const std::string fileName = "input100m.bin";
@@ -115,18 +163,20 @@ void testcase_sha3_2()
 int main()
 {
     void (*testcases[])() = {
-        testcase_sha3_1,
-        testcase_sha3_2,
-        testcase1,
-        testcase2,
+        test_sha3_1,
+        test_sha3_2,
+        test_aes_1,
+        test_aes_2,
     };
 
     for (int i = 0; i < sizeof(testcases) / sizeof(testcases[0]); i++)
     {
+        printf("==================== Testcase #%d ====================\n", i);
         int begin = clock();
         testcases[i]();
         int end = clock();
-        printf("testcase #%d passed. (%.3lfs)\n", i, 1.0 * (end - begin) / CLOCKS_PER_SEC);
+        printf("============ Testcase #%d passed (%.3lfs) ============\n\n",
+               i, 1.0 * (end - begin) / CLOCKS_PER_SEC);
     }
     return 0;
 }

@@ -245,12 +245,12 @@ void Sha3::keccakF1600(uint64_t* state)
 #undef A
 }
 
-ByteArray Sha3::hash(const ByteArray& buf)
+ByteArray Sha3::hash(const ByteArray& message)
 {
     memset(m_state, 0, sizeof(m_state));
 
     const int r_len = m_r / sizeof(uint64_t);
-    ByteArray buffer = buf.padding101(m_r);
+    ByteArray buffer = message.padding10Star1(m_r);
     uint64_t* ptr = (uint64_t*) &buffer[0];
 
     for (int i = 0; i < buffer.length(); i += m_r, ptr += r_len)
@@ -263,9 +263,11 @@ ByteArray Sha3::hash(const ByteArray& buf)
     ByteArray output(m_digest_size);
     ptr = (uint64_t*) &output[0];
 
-    for (int t = 0; t < 8;)
-        for (int j = 0; j < r_len && t < 8; j++)
-            ptr[t++] ^= m_state[j];
+    int len = output.length(), t = 0;
+    for (; len > sizeof(uint64_t); t++, len -= sizeof(uint64_t))
+        ptr[t] ^= m_state[t];
+    if (len)
+        ptr[t] ^= m_state[t];
 
     return output;
 }

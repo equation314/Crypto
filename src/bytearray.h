@@ -29,7 +29,7 @@ public:
 
     ByteArray padding(uint8_t align, uint8_t value = 0) const;
 
-    ByteArray padding101(uint8_t align) const;
+    ByteArray padding10Star1(uint8_t align) const;
 
     std::string toPlainText() const;
 
